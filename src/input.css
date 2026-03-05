@@ -69,14 +69,3 @@ canvas#map:active {
   transform: rotate(90deg);
 }
 
-/* Kern-list arrows */
-.kern-list li {
-  @apply text-sm leading-relaxed text-stone-500 pl-3.5 relative;
-}
-.kern-list li::before {
-  content: '\2192';
-  position: absolute;
-  left: 0;
-  color: theme(--color-orange-700);
-  font-weight: 700;
-}
