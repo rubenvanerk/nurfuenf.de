@@ -125,6 +125,25 @@
   .kern-list li::before{content:'→';position:absolute;left:0;color:var(--accent);font-weight:700;}
   .source-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:0.3rem;margin-top:0.35rem;}
   .source-list li{font-size:0.62rem;color:var(--text-muted);line-height:1.45;}
+  .comparison{
+    background:linear-gradient(135deg,rgba(26,122,138,0.06),rgba(26,138,101,0.04));
+    border:1px solid rgba(26,122,138,0.25);border-radius:8px;padding:1rem;
+  }
+  .comparison h2{font-family:'DM Serif Display',serif;font-size:0.95rem;font-weight:400;color:var(--suggested);margin-bottom:0.15rem;}
+  .comparison .comparison-intro{font-size:0.68rem;color:var(--text-muted);line-height:1.5;margin-bottom:0.7rem;}
+  .comparison-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:0 0.6rem;font-size:0.68rem;line-height:1.8;}
+  .comparison-grid .cg-header{font-size:0.55rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:var(--text-muted);padding-bottom:0.15rem;border-bottom:1px solid var(--border);}
+  .comparison-grid .cg-label{font-weight:700;color:var(--text);padding:0.1rem 0;}
+  .comparison-grid .cg-val{color:var(--text-muted);padding:0.1rem 0;}
+  .comparison-grid .cg-val.highlight{color:var(--gap);font-weight:700;}
+  .comparison-bar{margin-top:0.6rem;}
+  .comparison-bar .bar-label{font-size:0.6rem;color:var(--text-muted);margin-bottom:0.2rem;}
+  .comparison-bar .bar-track{background:var(--bg);border:1px solid var(--border);border-radius:4px;height:18px;position:relative;overflow:hidden;}
+  .comparison-bar .bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding:0 0.4rem;font-size:0.55rem;font-weight:700;color:#fff;}
+  .comparison-bar .bar-fill.augsburg{background:var(--covered);width:100%;}
+  .comparison-bar .bar-fill.karlsruhe{background:var(--gap);width:36%;}
+  .comparison-note{font-size:0.62rem;color:var(--text-muted);line-height:1.5;margin-top:0.6rem;}
+  .comparison-sources{margin-top:0.5rem;font-size:0.56rem;color:var(--text-muted);line-height:1.5;}
 </style>
 <script async src="https://plausible.poweredby.soy/js/pa-fG5WecfpzN9iivmvL3tnp.js"></script>
 <script>
@@ -210,6 +229,34 @@
         <div class="zone-card zone-gap"><h3>Nordstadt</h3><p>Nördliche Wohngebiete jenseits der 500m-Reichweite bestehender Türme.</p></div>
       </div>
     </div>
+    <!-- Augsburg-Vergleich -->
+    <div class="comparison">
+      <h2>Vergleich mit dem Vorbild: Augsburg</h2>
+      <p class="comparison-intro">Karlsruhe setzt nach eigenen Angaben das „Augsburger Modell" um. Ein Vergleich mit der Modellstadt zeigt, wie weit die Umsetzung hinterherhinkt.</p>
+      <div class="comparison-grid">
+        <span class="cg-header"></span><span class="cg-header">Augsburg</span><span class="cg-header">Karlsruhe</span>
+        <span class="cg-label">Einwohner</span><span class="cg-val">~300.000</span><span class="cg-val">~310.000</span>
+        <span class="cg-label">Schläge/Türme</span><span class="cg-val">mind. 12–14</span><span class="cg-val highlight">5</span>
+        <span class="cg-label">Eieraustausch</span><span class="cg-val">~6.200/Jahr ↓</span><span class="cg-val">~4.560/Jahr</span>
+        <span class="cg-label">Modell seit</span><span class="cg-val">1995</span><span class="cg-val">2018</span>
+        <span class="cg-label">Populationszählung</span><span class="cg-val">1996</span><span class="cg-val highlight">Nie</span>
+      </div>
+      <div class="comparison-bar">
+        <div class="bar-label">Schläge/Türme pro ~300.000 Einwohner:</div>
+        <div class="bar-track" style="margin-bottom:0.2rem"><div class="bar-fill augsburg">Augsburg: 12–14</div></div>
+        <div class="bar-track"><div class="bar-fill karlsruhe">KA: 5</div></div>
+      </div>
+      <p class="comparison-note">In Augsburg sinkt die Zahl der entnommenen Eier über die Jahre — von 13.000 (2013) auf ca. 6.200. Zwischen 2001 und 2016 wurden insgesamt ~109.400 Eier ausgetauscht. Die Population schrumpft nachweislich. Voraussetzung: flächendeckende Infrastruktur mit mindestens 12 Schlägen.</p>
+      <p class="comparison-note">In Augsburg wurden Schläge gezielt an allen Brennpunkten eingerichtet — in Parkhäusern, Wehrtürmen, auf Dachböden und Flachdächern. In Karlsruhe konzentrieren sich die fünf Türme auf die westliche Innenstadt, während Kronenplatz, Europaplatz und Ostring ohne Schlag bleiben.</p>
+      <p class="comparison-sources">
+        Quellen:
+        <a class="source-link" href="https://www.augsburg.de/umwelt-soziales/umwelt/umweltstadt-augsburg/stadttaubenkonzept" target="_blank">augsburg.de</a>,
+        <a class="source-link" href="https://www.tierschutzverein-augsburg.de/ueber-uns/augsburger-stadttauben/" target="_blank">Tierheim Augsburg, 2024</a>,
+        <a class="source-link" href="https://www.berlin.de/lb/tierschutz/tauben/artikel.1334323.php" target="_blank">berlin.de, 2023</a>,
+        <a class="source-link" href="https://www.staz.de/region/augsburg-stadt/lokales/kraehen-taubenplage-augsburg-id43646.html" target="_blank">StaZ, ~2020</a>
+      </p>
+    </div>
+
     <div>
       <h2 style="color:var(--suggested)">Vorgeschlagene Standorte <span class="ai-badge">KI-Empfehlung</span></h2>
       <p style="font-size:0.68rem;color:var(--text-muted);margin-bottom:0.4rem;line-height:1.45">
@@ -279,6 +326,14 @@
           <li><a class="source-link" href="https://meinka.de/karlsruher-taubenpopulation-wie-laeuft-das-augsburger-modell/" target="_blank">meinKA (Jun. 2020)</a> — GRÜNE-Anfrage, Hotspots, Waldstadt, Budget</li>
           <li><a class="source-link" href="https://www.karlsruhe-insider.de/news/mit-dieser-idee-soll-karlsruhe-taubenfrei-gehalten-werden-29671/" target="_blank">karlsruhe-insider.de (Jul. 2019)</a> — 380 Eier/Monat, 260→1.100 Tauben</li>
         </ul>
+        <p style="margin-top:0.5rem;font-size:0.65rem;font-weight:700;">Augsburg-Vergleich:</p>
+        <ul class="source-list">
+          <li><a class="source-link" href="https://www.augsburg.de/umwelt-soziales/umwelt/umweltstadt-augsburg/stadttaubenkonzept" target="_blank">augsburg.de (laufend aktualisiert)</a> — Offizielles Stadttaubenkonzept</li>
+          <li><a class="source-link" href="https://www.tierschutzverein-augsburg.de/ueber-uns/augsburger-stadttauben/" target="_blank">Tierheim Augsburg (Mai 2024)</a> — 12 Schläge/Häuser bestätigt</li>
+          <li><a class="source-link" href="https://www.berlin.de/lb/tierschutz/tauben/artikel.1334323.php" target="_blank">berlin.de / Landestierschutzbeauftragte (Feb. 2023)</a> — 10 Schläge + 2 Türme, 109.400 Eier 2001–2016</li>
+          <li><a class="source-link" href="https://www.staz.de/region/augsburg-stadt/lokales/kraehen-taubenplage-augsburg-id43646.html" target="_blank">StaZ Augsburg (~2020)</a> — 14 Schläge seit 2008, Ei-Zahlen, letzte Zählung 1996</li>
+          <li><a class="source-link" href="https://stadttaubenhilfe-boppard.de/fragen-und-antworten-zu-stadttauben/was-ist-das-augsburger-modell/" target="_blank">Stadttaubenhilfe Boppard</a> — 400m Fütterungsverbot-Radius</li>
+        </ul>
         <p style="margin-top:0.5rem;font-size:0.6rem;font-style:italic;">Wissenschaftliche Studien siehe „Wissenschaftliche Grundlage" oben.</p>
       </div>
     </details>
@@ -286,6 +341,7 @@
     <div class="methodology">
       <h3>Methodik</h3>
       <p>Turmkoordinaten von lokalen Tierschützern. Reichweiten: 300m (stark — Tauben nutzen zuverlässig einen nahen Turm), 500m (mäßig), 1000m (theoretisches Maximum). Flächenabdeckung berechnet gegen ein Polygon der bebauten Stadtfläche. Die Heatmap zeigt Bereiche, die außerhalb des gewählten Radius liegen — je dunkler, desto weiter entfernt vom nächsten Turm.</p>
+      <p style="margin-top:0.3rem">Das Augsburger Modell selbst empfiehlt ein Fütterungsverbot im Radius von ca. 400 Metern um jeden Schlag. Ein Fütterungsverbot ist nur dort sinnvoll und vertretbar, wo tatsächlich ein Turm in Reichweite ist. <span class="source-tag">(<a class="source-link" href="https://stadttaubenhilfe-boppard.de/fragen-und-antworten-zu-stadttauben/was-ist-das-augsburger-modell/" target="_blank">Stadttaubenhilfe Boppard / BAG Stadttauben</a>)</span></p>
       <p style="margin-top:0.3rem"><strong>Hinweis:</strong> Die Schätzung „Türme nötig" und die vorgeschlagenen Standorte sind <span class="ai-badge">KI-generiert</span> und berücksichtigen keine realen Taubenpopulationsdaten, Gebäudeverfügbarkeit oder lokale Besonderheiten. Sie dienen als Diskussionsgrundlage.</p>
     </div>
     <div style="margin-top:auto;padding-top:1rem;display:flex;justify-content:center;">
