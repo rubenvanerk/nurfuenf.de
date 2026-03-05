@@ -134,7 +134,7 @@
 
     <div class="overlay-panel controls-panel">
       <label class="toggle-row"><input type="checkbox" id="togGap" checked> Lücken-Heatmap</label>
-      <label class="toggle-row"><input type="checkbox" id="togSuggested" checked> Vorschläge <span class="ai-badge">KI</span></label>
+      <label class="toggle-row"><input type="checkbox" id="togSuggested"> Vorschläge <span class="ai-badge">KI</span></label>
       <label class="toggle-row"><input type="checkbox" id="togLabels" checked> Beschriftung</label>
       <div class="radius-label">Analyse-Radius:</div>
       <div class="radius-control">
@@ -148,7 +148,12 @@
       <button id="zoomIn">+</button>
       <button id="zoomOut">−</button>
       <button id="resetView">⌂</button>
+      <button id="locateMe" title="Mein Standort">◎</button>
     </div>
+    <div id="locBanner" style="display:none;position:absolute;bottom:0.8rem;left:50%;transform:translateX(-50%);
+      background:rgba(255,255,255,0.93);backdrop-filter:blur(10px);border:1px solid var(--border);
+      border-radius:9px;padding:0.5rem 0.9rem;font-size:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      text-align:center;max-width:280px;line-height:1.4;"></div>
 
     <div class="attribution">
       Kartendaten &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a> |
@@ -200,8 +205,8 @@
 
 <script>
 const TOWERS=[
-  {lat:49.01181645849692,lng:8.386081710794757,name:"Turm West"},
-  {lat:49.01277349211771,lng:8.406852737509208,name:"Turm Mitte-West"},
+  {lat:49.010924967578234,lng:8.386127143611693,name:"Turm West"},
+  {lat:49.01189835923452,lng:8.406438513549588,name:"Turm Mitte-West"},
   {lat:49.00759741335346,lng:8.398087439992846,name:"Turm Süd-Mitte"},
   {lat:49.00947898308795,lng:8.419205592852764,name:"Turm Mitte-Ost"},
   {lat:48.998463819002204,lng:8.474148930061281,name:"Turm Durlach"},
@@ -231,7 +236,7 @@ function lng2x(lng){return(lng+180)/360;}
 
 let mapZoom=14,centerX=lng2x(8.420),centerY=lat2y(49.005),panX=0,panY=0;
 let analysisRadius=500;
-let layers={gap:true,suggested:true,labels:true};
+let layers={gap:true,suggested:false,labels:true};
 
 function worldScale(){return 256*Math.pow(2,mapZoom);}
 function resize(){
@@ -457,6 +462,37 @@ function drawScale(){
   ctx.textAlign='center';ctx.fillText('500m',x+px/2,y-7);
 }
 
+// === USER LOCATION ===
+let userLoc=null;
+function drawUserLocation(){
+  if(!userLoc)return;
+  const p=geo(userLoc.lat,userLoc.lng);
+  // Distance to nearest tower
+  let minDist=Infinity;
+  for(const t of TOWERS){
+    const dl=(userLoc.lat-t.lat)*D2M_LAT,dn=(userLoc.lng-t.lng)*D2M_LNG;
+    const d=Math.sqrt(dl*dl+dn*dn);if(d<minDist)minDist=d;
+  }
+  const covered=minDist<=analysisRadius;
+  const color=covered?'#1a8a65':'#c0392b';
+  // Pulse ring
+  ctx.beginPath();ctx.arc(p.x,p.y,14,0,Math.PI*2);
+  ctx.fillStyle=color+'30';ctx.fill();
+  // Dot
+  ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);
+  ctx.fillStyle=color;ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+  // Label
+  const distText=minDist>=1000?(minDist/1000).toFixed(1)+'km':Math.round(minDist)+'m';
+  const label=covered?'Im Versorgungsbereich ('+distText+')':'Außerhalb ('+distText+' zum nächsten Turm)';
+  const banner=document.getElementById('locBanner');
+  banner.style.display='block';
+  banner.style.borderColor=color;
+  banner.innerHTML=covered
+    ?'<strong style="color:#1a8a65">✓ Im Versorgungsbereich</strong><br>'+distText+' zum nächsten Turm — hier nicht füttern.'
+    :'<strong style="color:#c0392b">✗ Keine Turmversorgung</strong><br>'+distText+' zum nächsten Turm — Tauben hier sind auf sich gestellt.';
+}
+
 // === RENDER ===
 let rq=false;
 function render(){
@@ -465,7 +501,7 @@ function render(){
     rq=false;
     ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.clearRect(0,0,W(),H());
-    drawTiles();drawGap();drawBoundary();drawRings();drawSuggested();drawTowerMarkers();drawScale();
+    drawTiles();drawGap();drawBoundary();drawRings();drawSuggested();drawTowerMarkers();drawUserLocation();drawScale();
     ctx.restore();
   });
 }
@@ -504,6 +540,19 @@ function zoomBy(f){
 document.getElementById('zoomIn').onclick=()=>zoomBy(0.5);
 document.getElementById('zoomOut').onclick=()=>zoomBy(-0.5);
 document.getElementById('resetView').onclick=()=>{mapZoom=14;panX=0;panY=0;render();};
+document.getElementById('locateMe').onclick=()=>{
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    const ws=worldScale();
+    panX=lng2x(userLoc.lng)*ws-centerX*ws;
+    panY=lat2y(userLoc.lat)*ws-centerY*ws;
+    mapZoom=15;render();
+  },()=>{
+    document.getElementById('locBanner').style.display='block';
+    document.getElementById('locBanner').innerHTML='Standort konnte nicht ermittelt werden.';
+  });
+};
 
 // Simplified toggles
 ['togGap','togSuggested','togLabels'].forEach(id=>{
