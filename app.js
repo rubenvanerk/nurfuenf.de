@@ -354,7 +354,7 @@ function lng2x(lng){return(lng+180)/360;}
 
 let mapZoom=window.innerWidth>=768?13:12,centerX=lng2x(8.419),centerY=lat2y(49.013),panX=0,panY=0;
 let analysisRadius=500;
-let layers={gap:true,labels:false,hotspots:false};
+let layers={labels:false,hotspots:false};
 
 function worldScale(){return 256*Math.pow(2,mapZoom);}
 function resize(){
@@ -405,92 +405,9 @@ function drawTiles(){
 }
 
 // === HELPERS ===
-function pip(lat,lng,poly){
-  let inside=false;
-  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
-    const yi=poly[i].lat,xi=poly[i].lng,yj=poly[j].lat,xj=poly[j].lng;
-    if((yi>lat)!==(yj>lat)&&lng<(xj-xi)*(lat-yi)/(yj-yi)+xi)inside=!inside;
-  }return inside;
-}
 const D2M_LAT=111320,D2M_LNG=111320*Math.cos(49.005*Math.PI/180);
 
-// Precompute distance grid
-const GRID_STEP=0.00015;
-const LAT_MIN=48.938,LAT_MAX=49.093,LNG_MIN=8.275,LNG_MAX=8.543;
-const GRID_COLS=Math.ceil((LNG_MAX-LNG_MIN)/GRID_STEP);
-const GRID_ROWS=Math.ceil((LAT_MAX-LAT_MIN)/GRID_STEP);
-let distGrid=null;
-let inBoundary=null;
-
-function precomputeDistances(){
-  distGrid=new Float32Array(GRID_ROWS*GRID_COLS);
-  inBoundary=new Uint8Array(GRID_ROWS*GRID_COLS);
-  for(let r=0;r<GRID_ROWS;r++){
-    const lat=LAT_MAX-r*GRID_STEP;
-    for(let c=0;c<GRID_COLS;c++){
-      const lng=LNG_MIN+c*GRID_STEP;
-      const idx=r*GRID_COLS+c;
-      inBoundary[idx]=pip(lat,lng,URBAN_BOUNDARY)?1:0;
-      if(!inBoundary[idx]){distGrid[idx]=0;continue;}
-      let mn=Infinity;
-      for(const t of TOWERS){
-        const dl=(lat-t.lat)*D2M_LAT,dn=(lng-t.lng)*D2M_LNG;
-        const d=Math.sqrt(dl*dl+dn*dn);if(d<mn)mn=d;
-      }
-      distGrid[idx]=mn;
-    }
-  }
-}
-
-// Build heatmap canvas for current radius
-let gapCanvas=null;
-function buildGapCanvas(){
-  gapCanvas=document.createElement('canvas');
-  gapCanvas.width=GRID_COLS;gapCanvas.height=GRID_ROWS;
-  const gctx=gapCanvas.getContext('2d');
-  const imgData=gctx.createImageData(GRID_COLS,GRID_ROWS);
-  const rad=analysisRadius;
-  const fadeRange=rad*0.3;
-  const maxAlpha=rad<=300?110:rad<=500?90:70;
-
-  for(let i=0;i<GRID_ROWS*GRID_COLS;i++){
-    const px=i*4;
-    if(!inBoundary[i]){imgData.data[px+3]=0;continue;}
-    const d=distGrid[i];
-    if(d>rad){
-      const beyond=d-rad;
-      const intensity=Math.min(beyond/fadeRange,1);
-      imgData.data[px]=192;
-      imgData.data[px+1]=50;
-      imgData.data[px+2]=40;
-      imgData.data[px+3]=Math.round(intensity*maxAlpha);
-    } else {
-      imgData.data[px+3]=0;
-    }
-  }
-  gctx.putImageData(imgData,0,0);
-}
-
-function calcCoverage(){
-  let covered=0,total=0;
-  for(let i=0;i<GRID_ROWS*GRID_COLS;i++){
-    if(!inBoundary[i])continue;
-    total++;
-    if(distGrid[i]<=analysisRadius)covered++;
-  }
-  const pct=total>0?covered/total*100:0;
-  document.getElementById('coveredPct').textContent=Math.round(pct)+'%';
-  document.getElementById('gapPct').textContent=Math.round(100-pct)+'%';
-  document.getElementById('radiusLabel').textContent=analysisRadius>=1000?(analysisRadius/1000)+'km':analysisRadius+'m';
-}
-
 // === DRAWING ===
-function drawGap(){
-  if(!layers.gap||!gapCanvas)return;
-  const tl=geo(LAT_MAX,LNG_MIN),br=geo(LAT_MIN,LNG_MAX);
-  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(gapCanvas,tl.x,tl.y,br.x-tl.x,br.y-tl.y);
-}
 
 function drawBoundary(){
   ctx.beginPath();
@@ -498,7 +415,7 @@ function drawBoundary(){
   ctx.moveTo(f.x,f.y);
   for(let i=1;i<URBAN_BOUNDARY.length;i++){const p=geo(URBAN_BOUNDARY[i].lat,URBAN_BOUNDARY[i].lng);ctx.lineTo(p.x,p.y);}
   ctx.closePath();
-  ctx.strokeStyle='rgba(100,90,80,0.3)';ctx.lineWidth=2;
+  ctx.strokeStyle='oklch(55.3% .195 38.402 / 0.5)';ctx.lineWidth=2.5;
   ctx.setLineDash([8,5]);ctx.stroke();ctx.setLineDash([]);
 }
 
@@ -621,7 +538,7 @@ function render(){
     rq=false;
     ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.clearRect(0,0,W(),H());
-    drawTiles();drawGap();drawBoundary();drawRings();drawHotspots();drawTowerMarkers();drawUserLocation();drawScale();
+    drawTiles();drawBoundary();drawRings();drawHotspots();drawTowerMarkers();drawUserLocation();drawScale();
     ctx.restore();
   });
 }
@@ -729,8 +646,8 @@ document.getElementById('locateMe').onclick=()=>{
   },{enableHighAccuracy:true,timeout:10000});
 };
 
-['togGap','togLabels','togHotspots'].forEach(id=>{
-  const k={togGap:'gap',togLabels:'labels',togHotspots:'hotspots'}[id];
+['togLabels','togHotspots'].forEach(id=>{
+  const k={togLabels:'labels',togHotspots:'hotspots'}[id];
   document.getElementById(id).onchange=e=>{layers[k]=e.target.checked;render();};
 });
 
@@ -739,8 +656,6 @@ document.querySelectorAll('.radius-btn').forEach(b=>{
     document.querySelectorAll('.radius-btn').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     analysisRadius=parseInt(b.dataset.r);
-    buildGapCanvas();
-    calcCoverage();
     render();
   };
 });
@@ -748,7 +663,4 @@ document.querySelectorAll('.radius-btn').forEach(b=>{
 // Init
 window.addEventListener('resize',()=>{dpr=window.devicePixelRatio||1;resize();render();});
 resize();
-precomputeDistances();
-buildGapCanvas();
-calcCoverage();
 render();
