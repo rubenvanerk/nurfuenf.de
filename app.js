@@ -648,7 +648,9 @@ document.getElementById('locateMe').onclick=()=>{
 
 ['togLabels','togHotspots'].forEach(id=>{
   const k={togLabels:'labels',togHotspots:'hotspots'}[id];
-  document.getElementById(id).onchange=e=>{layers[k]=e.target.checked;render();};
+  const el=document.getElementById(id);
+  layers[k]=el.checked;
+  el.onchange=e=>{layers[k]=e.target.checked;render();};
 });
 
 document.querySelectorAll('.radius-btn').forEach(b=>{
