@@ -3,7 +3,7 @@ const TOWERS=[
   {lat:49.01189835923452,lng:8.406438513549588,name:"Turm Mitte-West"},
   {lat:49.00759741335346,lng:8.398087439992846,name:"Schlag Süd-Mitte"},
   {lat:49.00947898308795,lng:8.419205592852764,name:"Schlag Mitte-Ost"},
-  {lat:48.998463819002204,lng:8.474148930061281,name:"Turm Durlach"},
+  {lat:48.998463819002204,lng:8.474148930061281,name:"Schlag Durlach"},
 ];
 const HOTSPOTS=[
   {lat:49.01003920549964,lng:8.394179505229648,name:"Europaplatz",trend:"stable"},
